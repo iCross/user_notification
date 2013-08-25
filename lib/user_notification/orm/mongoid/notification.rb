@@ -12,7 +12,7 @@ module UserNotification
         include Renderable
 
         # Define polymorphic association to the parent
-        belongs_to :trackable,  polymorphic: true
+        belongs_to :notifiable,  polymorphic: true
         # Define ownership to a resource responsible for this notification
         belongs_to :owner,      polymorphic: true
         # Define ownership to a resource targeted by this notification

@@ -22,7 +22,7 @@ module UserNotification
     extend ActiveSupport::Concern
 
     included do
-      include Trackable
+      include Notifiable
       class_attribute :notification_owner_global, :notification_recipient_global,
                       :notification_params_global, :notification_hooks, :notification_custom_fields_global
       set_user_notification_class_defaults

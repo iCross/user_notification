@@ -3,7 +3,7 @@ class CreateNotifications < ActiveRecord::Migration
   # Create table
   def self.up
     create_table :notifications do |t|
-      t.belongs_to :trackable, :polymorphic => true
+      t.belongs_to :notifiable, :polymorphic => true
       t.belongs_to :owner, :polymorphic => true
       t.string  :key
       t.text    :parameters
@@ -13,7 +13,7 @@ class CreateNotifications < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_index :notifications, [:trackable_id, :trackable_type]
+    add_index :notifications, [:notifiable_id, :notifiable_type]
     add_index :notifications, [:owner_id, :owner_type]
     add_index :notifications, [:recipient_id, :recipient_type]
   end

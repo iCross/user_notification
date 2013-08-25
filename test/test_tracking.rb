@@ -69,7 +69,7 @@ describe UserNotification::ActsAsNotifiable do
 
     art = ActivistAndNotifiableArticle.new
     art.save
-    art.notifications.last.trackable_id.must_equal art.id
+    art.notifications.last.notifiable_id.must_equal art.id
     art.notifications.last.owner_id.must_equal nil
   end
 

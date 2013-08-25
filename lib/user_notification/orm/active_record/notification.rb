@@ -7,7 +7,7 @@ module UserNotification
         include Renderable
 
         # Define polymorphic association to the parent
-        belongs_to :trackable, :polymorphic => true
+        belongs_to :notifiable, :polymorphic => true
         # Define ownership to a resource responsible for this notification
         belongs_to :owner, :polymorphic => true
         # Define ownership to a resource targeted by this notification
@@ -16,7 +16,7 @@ module UserNotification
         serialize :parameters, Hash
 
         if ::ActiveRecord::VERSION::MAJOR < 4
-          attr_accessible :key, :owner, :parameters, :recipient, :trackable
+          attr_accessible :key, :owner, :parameters, :recipient, :notifiable
         end
       end
     end

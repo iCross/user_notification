@@ -12,7 +12,7 @@ module UserNotification
   autoload :Notification,     'user_notification/models/notification'
   autoload :Activist,     'user_notification/models/activist'
   autoload :Adapter,      'user_notification/models/adapter'
-  autoload :Trackable,    'user_notification/models/trackable'
+  autoload :Notifiable,    'user_notification/models/notifiable'
   autoload :Common
   autoload :Config
   autoload :Creation,     'user_notification/actions/creation.rb'
