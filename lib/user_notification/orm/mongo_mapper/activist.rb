@@ -21,7 +21,7 @@ module UserNotification
           # Adds MongoMapper associations to model to simplify fetching
           # so you can list notifications performed by the owner.
           # It is completely optional. Any model can be an owner to an notification
-          # even without being an explicit activist.
+          # even without being an explicit acts_as_activist.
           #
           # == Usage:
           # In model:
@@ -29,13 +29,13 @@ module UserNotification
           #   class User
           #     include MongoMapper::Document
           #     include UserNotification::Model
-          #     activist
+          #     acts_as_activist
           #   end
           #
           # In controller:
           #   User.first.notifications
           #
-          def activist
+          def acts_as_activist
             many :notifications_as_owner,      :class_name => "::UserNotification::Notification", :as => :owner
             many :notifications_as_recipient,  :class_name => "::UserNotification::Notification", :as => :recipient do
               def unread

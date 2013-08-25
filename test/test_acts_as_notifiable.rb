@@ -38,7 +38,7 @@ describe UserNotification::ActsAsNotifiable do
           field :name, type: String
           field :published, type: Boolean
           acts_as_notifiable
-          activist
+          acts_as_activist
         end
       when :mongo_mapper
         class ActivistAndNotifiableArticle
@@ -50,7 +50,7 @@ describe UserNotification::ActsAsNotifiable do
           key :name, String
           key :published, Boolean
           acts_as_notifiable
-          activist
+          acts_as_activist
           timestamps!
         end
       when :active_record
@@ -58,7 +58,7 @@ describe UserNotification::ActsAsNotifiable do
           self.table_name = 'articles'
           include UserNotification::Model
           acts_as_notifiable
-          activist
+          acts_as_activist
 
           if ::ActiveRecord::VERSION::MAJOR < 4
             attr_accessible :name, :published, :user

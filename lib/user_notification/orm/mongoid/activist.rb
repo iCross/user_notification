@@ -21,20 +21,20 @@ module UserNotification
           # Adds ActiveRecord associations to model to simplify fetching
           # so you can list notifications performed by the owner.
           # It is completely optional. Any model can be an owner to an notification
-          # even without being an explicit activist.
+          # even without being an explicit acts_as_activist.
           #
           # == Usage:
           # In model:
           #
           #   class User < ActiveRecord::Base
           #     include UserNotification::Model
-          #     activist
+          #     acts_as_activist
           #   end
           #
           # In controller:
           #   User.first.notifications
           #
-          def activist
+          def acts_as_activist
             has_many :notifications_as_owner,      :class_name => "::UserNotification::Notification", :inverse_of => :owner
             has_many :notifications_as_recipient,  :class_name => "::UserNotification::Notification", :inverse_of => :recipient do
               def unread

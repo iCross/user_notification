@@ -3,8 +3,8 @@ require 'test_helper'
 describe UserNotification::Activist do
   it 'adds owner association' do
     klass = article
-    klass.must_respond_to :activist
-    klass.activist
+    klass.must_respond_to :acts_as_activist
+    klass.acts_as_activist
     klass.new.must_respond_to :notifications
     case ENV["PA_ORM"]
       when "active_record"
@@ -28,13 +28,13 @@ describe UserNotification::Activist do
         class ActivistUser < ActiveRecord::Base
           include UserNotification::Model
           self.table_name = 'users'
-          activist
+          acts_as_activist
         end
       when :mongoid
         class ActivistUser
           include Mongoid::Document
           include UserNotification::Model
-          activist
+          acts_as_activist
 
           field :name, type: String
         end
@@ -42,7 +42,7 @@ describe UserNotification::Activist do
         class ActivistUser
           include MongoMapper::Document
           include UserNotification::Model
-          activist
+          acts_as_activist
 
           key :name, String
         end
