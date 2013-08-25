@@ -30,7 +30,7 @@ when :active_record
     klass = Class.new(ActiveRecord::Base) do
       self.table_name = 'articles'
       include UserNotification::Model
-      tracked options
+      notifiable options
       belongs_to :user
 
       def self.name
@@ -78,7 +78,7 @@ when :mongoid
   def article(options = {})
     Article.class_eval do
       set_user_notification_class_defaults
-      tracked options
+      notifiable options
     end
     Article
   end
@@ -111,7 +111,7 @@ when :mongo_mapper
   def article(options = {})
     Article.class_eval do
       set_user_notification_class_defaults
-      tracked options
+      notifiable options
     end
     Article
   end

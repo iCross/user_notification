@@ -1,6 +1,6 @@
 module UserNotification
   # Main module extending classes we want to keep track of.
-  module Tracked
+  module Notifiable
     extend ActiveSupport::Concern
     # A shortcut method for setting custom key, owner and parameters of {Notification}
     # in one line. Accepts a hash with 3 keys:
@@ -25,7 +25,7 @@ module UserNotification
     #   @article.notifications.last.key #=> "my.custom.article.key"
     #   @article.notifications.last.parameters #=> {:title => "New article"}
     #
-    # @param options [Hash] instance options to set on the tracked model
+    # @param options [Hash] instance options to set on the notifiable model
     # @return [nil]
     def notification(options = {})
       rest = options.clone
@@ -37,10 +37,10 @@ module UserNotification
       nil
     end
 
-    # Module with basic +tracked+ method that enables tracking models.
+    # Module with basic +notifiable+ method that enables tracking models.
     module ClassMethods
       # Adds required callbacks for creating and updating
-      # tracked models and adds +notifications+ relation for listing
+      # notifiable models and adds +notifications+ relation for listing
       # associated notifications.
       #
       # == Parameters:
@@ -49,8 +49,8 @@ module UserNotification
       #   It can be a Proc, Symbol or an ActiveRecord object:
       #   == Examples:
       #
-      #    tracked :owner => :author
-      #    tracked :owner => proc {|o| o.author}
+      #    notifiable :owner => :author
+      #    notifiable :owner => proc {|o| o.author}
       #
       #   Keep in mind that owner relation is polymorphic, so you can't just
       #   provide id number of the owner object.
@@ -59,8 +59,8 @@ module UserNotification
       #   It can be a Proc, Symbol, or an ActiveRecord object
       #   == Examples:
       #
-      #    tracked :recipient => :author
-      #    tracked :recipient => proc {|o| o.author}
+      #    notifiable :recipient => :author
+      #    notifiable :recipient => proc {|o| o.author}
       #
       #   Keep in mind that recipient relation is polymorphic, so you can't just
       #   provide id number of the owner object.
@@ -70,7 +70,7 @@ module UserNotification
       #   == Example:
       #    class Article < ActiveRecord::Base
       #      include UserNotification::Model
-      #      tracked :params => {
+      #      notifiable :params => {
       #          :title => :title,
       #          :author_name => "Michael",
       #          :category_name => proc {|controller, model_instance| model_instance.category.name},
@@ -79,7 +79,7 @@ module UserNotification
       #    end
       #
       #   Values in the :params hash can either be an *exact* *value*, a *Proc/Lambda* executed before saving the notification or a *Symbol*
-      #   which is a an attribute or a method name executed on the tracked model's instance.
+      #   which is a an attribute or a method name executed on the notifiable model's instance.
       #
       #   Everything specified here has a lower priority than parameters
       #   specified directly in {#notification} method.
@@ -95,7 +95,7 @@ module UserNotification
       #   * _:update_
       #   * _:destroy_
       #   Selecting one or more of these will make UserNotification create notifications
-      #   automatically for the tracked model on selected actions.
+      #   automatically for the notifiable model on selected actions.
       #
       #   Resulting notifications will have have keys assigned to, respectively:
       #   * _article.create_
@@ -123,14 +123,14 @@ module UserNotification
       #
       #   == Example:
       #     # app/models/article.rb
-      #     tracked :on => {:update => proc {|model, controller| model.published? }}
+      #     notifiable :on => {:update => proc {|model, controller| model.published? }}
       #
       #   In the example above, given a model Article with boolean column _published_.
       #   The notifications with key _article.update_ will only be created
       #   if the published status is set to true on that article.
       # @param opts [Hash] options
       # @return [nil] options
-      def tracked(opts = {})
+      def notifiable(opts = {})
         options = opts.clone
 
         all_options = [:create, :update, :destroy]

@@ -134,11 +134,11 @@ module UserNotification
       end
 
       # Extracts a hook from the _:on_ option provided in
-      # {Tracked::ClassMethods#tracked}. Returns nil when no hook exists for
+      # {Notifiable::ClassMethods#notifiable}. Returns nil when no hook exists for
       # given action
       # {Common#get_hook}
       #
-      # @see Tracked#get_hook
+      # @see Notifiable#get_hook
       # @param key [String, Symbol] action to retrieve a hook for
       # @return [Proc, nil] callable hook or nil
       # @since 0.4.0
@@ -196,7 +196,7 @@ module UserNotification
     #   current_user.create_notification(:avatar_changed)
     #
     # It will still gather data from any procs or symbols you passed as params
-    # to {Tracked::ClassMethods#tracked}. It will ask the hooks you defined
+    # to {Notifiable::ClassMethods#notifiable}. It will ask the hooks you defined
     # whether to really save this notification.
     #
     # But you can also overwrite instance and global settings with your options:
@@ -221,9 +221,9 @@ module UserNotification
     #     @article.create_notification :commented_on
     #     @article.notifications.last.key # => "article.commented_on"
     #
-    # For other parameters, see {Tracked#notification}, and "Instance options"
-    # accessors at {Tracked}, information on hooks is available at
-    # {Tracked::ClassMethods#tracked}.
+    # For other parameters, see {Notifiable#notification}, and "Instance options"
+    # accessors at {Notifiable}, information on hooks is available at
+    # {Notifiable::ClassMethods#notifiable}.
     # @see #prepare_settings
     # @return [Model, nil] If created successfully, new notification
     # @since 0.4.0
@@ -231,14 +231,14 @@ module UserNotification
     # @overload create_notification(action, options = {})
     #   @param [Symbol,String] action Name of the action
     #   @param [Hash] options Options with quality higher than instance options
-    #     set in {Tracked#notification}
+    #     set in {Notifiable#notification}
     #   @option options [Activist] :owner Owner
     #   @option options [Activist] :recipient Recipient
     #   @option options [Hash] :params Parameters, see
     #     {UserNotification.resolve_value}
     # @overload create_notification(options = {})
     #   @param [Hash] options Options with quality higher than instance options
-    #     set in {Tracked#notification}
+    #     set in {Notifiable#notification}
     #   @option options [Symbol,String] :action Name of the action
     #   @option options [String] :key Full key
     #   @option options [Activist] :owner Owner
@@ -258,8 +258,8 @@ module UserNotification
     end
 
     # Prepares settings used during creation of Notification record.
-    # params passed directly to tracked model have priority over
-    # settings specified in tracked() method
+    # params passed directly to notifiable model have priority over
+    # settings specified in notifiable() method
     #
     # @see #create_notification
     # @return [Hash] Settings with preserved options that were passed

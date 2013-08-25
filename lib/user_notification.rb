@@ -3,7 +3,7 @@ require 'action_view'
 # +user_notification+ keeps track of changes made to models
 # and allows you to display them to the users.
 #
-# Check {UserNotification::Tracked::ClassMethods#tracked} for more details about customizing and specifying
+# Check {UserNotification::Notifiable::ClassMethods#notifiable} for more details about customizing and specifying
 # ownership to users.
 module UserNotification
   extend ActiveSupport::Concern
@@ -19,7 +19,7 @@ module UserNotification
   autoload :Deactivatable,'user_notification/roles/deactivatable.rb'
   autoload :Destruction,  'user_notification/actions/destruction.rb'
   autoload :Renderable
-  autoload :Tracked,      'user_notification/roles/tracked.rb'
+  autoload :Notifiable,      'user_notification/roles/notifiable.rb'
   autoload :Update,       'user_notification/actions/update.rb'
   autoload :VERSION
 
@@ -58,7 +58,7 @@ module UserNotification
     included do
       include Common
       include Deactivatable
-      include Tracked
+      include Notifiable
       include Activist  # optional associations by recipient|owner
     end
   end

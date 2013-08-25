@@ -1,5 +1,5 @@
 module UserNotification
-  # Handles creation of Activities upon destruction and update of tracked model.
+  # Handles creation of Activities upon destruction and update of notifiable model.
   module Creation
     extend ActiveSupport::Concern
 
@@ -7,7 +7,7 @@ module UserNotification
       after_create :notification_on_create
     end
     private
-      # Creates notification upon creation of the tracked model
+      # Creates notification upon creation of the notifiable model
       def notification_on_create
         create_notification(:create)
       end

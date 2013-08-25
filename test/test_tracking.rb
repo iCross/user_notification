@@ -1,6 +1,6 @@
 require 'test_helper'
 
-describe UserNotification::Tracked do
+describe UserNotification::Notifiable do
   describe 'defining instance options' do
     subject { article.new }
     let :options do
@@ -25,10 +25,10 @@ describe UserNotification::Tracked do
     specify { notification.recipient.must_equal              options[:recipient] }
   end
 
-  it 'can be tracked and be an activist at the same time' do
+  it 'can be notifiable and be an activist at the same time' do
     case UserNotification.config.orm
       when :mongoid
-        class ActivistAndTrackedArticle
+        class ActivistAndNotifiableArticle
           include Mongoid::Document
           include Mongoid::Timestamps
           include UserNotification::Model
@@ -37,11 +37,11 @@ describe UserNotification::Tracked do
 
           field :name, type: String
           field :published, type: Boolean
-          tracked
+          notifiable
           activist
         end
       when :mongo_mapper
-        class ActivistAndTrackedArticle
+        class ActivistAndNotifiableArticle
           include MongoMapper::Document
           include UserNotification::Model
 
@@ -49,15 +49,15 @@ describe UserNotification::Tracked do
 
           key :name, String
           key :published, Boolean
-          tracked
+          notifiable
           activist
           timestamps!
         end
       when :active_record
-        class ActivistAndTrackedArticle < ActiveRecord::Base
+        class ActivistAndNotifiableArticle < ActiveRecord::Base
           self.table_name = 'articles'
           include UserNotification::Model
-          tracked
+          notifiable
           activist
 
           if ::ActiveRecord::VERSION::MAJOR < 4
@@ -67,7 +67,7 @@ describe UserNotification::Tracked do
         end
     end
 
-    art = ActivistAndTrackedArticle.new
+    art = ActivistAndNotifiableArticle.new
     art.save
     art.notifications.last.trackable_id.must_equal art.id
     art.notifications.last.owner_id.must_equal nil
@@ -159,7 +159,7 @@ describe UserNotification::Tracked do
     end
   end
 
-  describe '#tracked' do
+  describe '#notifiable' do
     subject { article(options) }
     let(:options) { {} }
 
@@ -175,7 +175,7 @@ describe UserNotification::Tracked do
 
             field :name, type: String
             field :published, type: Boolean
-            tracked :skip_defaults => true
+            notifiable :skip_defaults => true
           end
         when :mongo_mapper
           art = Class.new do
@@ -186,7 +186,7 @@ describe UserNotification::Tracked do
 
             key :name, String
             key :published, Boolean
-            tracked :skip_defaults => true
+            notifiable :skip_defaults => true
 
             timestamps!
           end
@@ -232,7 +232,7 @@ describe UserNotification::Tracked do
 
             field :name, type: String
             field :published, type: Boolean
-            tracked :except => [:create]
+            notifiable :except => [:create]
           end
         when :mongo_mapper
           art = Class.new do
@@ -243,7 +243,7 @@ describe UserNotification::Tracked do
 
             key :name, String
             key :published, Boolean
-            tracked :except => [:create]
+            notifiable :except => [:create]
 
             timestamps!
           end
@@ -269,7 +269,7 @@ describe UserNotification::Tracked do
             field :name, type: String
             field :published, type: Boolean
 
-            tracked :only => [:create, :update]
+            notifiable :only => [:create, :update]
           end
         when :mongo_mapper
           art = Class.new do
@@ -281,7 +281,7 @@ describe UserNotification::Tracked do
             key :name, String
             key :published, Boolean
 
-            tracked :only => [:create, :update]
+            notifiable :only => [:create, :update]
           end
         when :active_record
           art = article({:only => [:create, :update]})
@@ -294,31 +294,31 @@ describe UserNotification::Tracked do
 
     it 'accepts :owner option' do
       owner = mock('owner')
-      subject.tracked(:owner => owner)
+      subject.notifiable(:owner => owner)
       subject.notification_owner_global.must_equal owner
     end
 
     it 'accepts :params option' do
       params = {:a => 1}
-      subject.tracked(:params => params)
+      subject.notifiable(:params => params)
       subject.notification_params_global.must_equal params
     end
 
     it 'accepts :on option' do
       on = {:a => lambda{}, :b => proc {}}
-      subject.tracked(:on => on)
+      subject.notifiable(:on => on)
       subject.notification_hooks.must_equal on
     end
 
     it 'accepts :on option with string keys' do
       on = {'a' => lambda {}}
-      subject.tracked(:on => on)
+      subject.notifiable(:on => on)
       subject.notification_hooks.must_equal on.symbolize_keys
     end
 
     it 'accepts :on values that are procs' do
       on = {:unpassable => 1, :proper => lambda {}, :proper_proc => proc {}}
-      subject.tracked(:on => on)
+      subject.notifiable(:on => on)
       subject.notification_hooks.must_include :proper
       subject.notification_hooks.must_include :proper_proc
       subject.notification_hooks.wont_include :unpassable
@@ -350,7 +350,7 @@ describe UserNotification::Tracked do
     end
 
     it 'allows hooks to decide if notification should be created' do
-      subject.tracked
+      subject.notifiable
       @article = subject.new(:name => 'Some Name')
       UserNotification.set_controller(mock('controller'))
       pf = proc { |model, controller|
