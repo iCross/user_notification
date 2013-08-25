@@ -8,6 +8,7 @@ class CreateNotifications < ActiveRecord::Migration
       t.string  :key
       t.text    :parameters
       t.belongs_to :recipient, :polymorphic => true
+      t.boolwan :read, default: false
 
       t.timestamps
     end
