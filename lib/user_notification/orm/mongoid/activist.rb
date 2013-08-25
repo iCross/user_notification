@@ -36,7 +36,11 @@ module UserNotification
           #
           def activist
             has_many :notifications_as_owner,      :class_name => "::UserNotification::Notification", :inverse_of => :owner
-            has_many :notifications_as_recipient,  :class_name => "::UserNotification::Notification", :inverse_of => :recipient
+            has_many :notifications_as_recipient,  :class_name => "::UserNotification::Notification", :inverse_of => :recipient do
+              def unread
+                where(read: false)
+              end
+            end
           end
         end
       end

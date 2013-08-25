@@ -37,7 +37,11 @@ module UserNotification
           #
           def activist
             many :notifications_as_owner,      :class_name => "::UserNotification::Notification", :as => :owner
-            many :notifications_as_recipient,  :class_name => "::UserNotification::Notification", :as => :recipient
+            many :notifications_as_recipient,  :class_name => "::UserNotification::Notification", :as => :recipient do
+              def unread
+                where(read: false)
+              end
+            end
           end
         end
       end
