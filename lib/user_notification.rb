@@ -19,7 +19,7 @@ module UserNotification
   autoload :Deactivatable,'user_notification/roles/deactivatable.rb'
   autoload :Destruction,  'user_notification/actions/destruction.rb'
   autoload :Renderable
-  autoload :Notifiable,      'user_notification/roles/notifiable.rb'
+  autoload :ActsAsNotifiable,      'user_notification/roles/acts_as_notifiable.rb'
   autoload :Update,       'user_notification/actions/update.rb'
   autoload :VERSION
 
@@ -58,7 +58,7 @@ module UserNotification
     included do
       include Common
       include Deactivatable
-      include Notifiable
+      include ActsAsNotifiable
       include Activist  # optional associations by recipient|owner
     end
   end

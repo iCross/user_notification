@@ -1,6 +1,6 @@
 require 'test_helper'
 
-describe UserNotification::Notifiable do
+describe UserNotification::ActsAsNotifiable do
   describe 'defining instance options' do
     subject { article.new }
     let :options do
@@ -25,7 +25,7 @@ describe UserNotification::Notifiable do
     specify { notification.recipient.must_equal              options[:recipient] }
   end
 
-  it 'can be notifiable and be an activist at the same time' do
+  it 'can be acts_as_notifiable and be an activist at the same time' do
     case UserNotification.config.orm
       when :mongoid
         class ActivistAndNotifiableArticle
@@ -37,7 +37,7 @@ describe UserNotification::Notifiable do
 
           field :name, type: String
           field :published, type: Boolean
-          notifiable
+          acts_as_notifiable
           activist
         end
       when :mongo_mapper
@@ -49,7 +49,7 @@ describe UserNotification::Notifiable do
 
           key :name, String
           key :published, Boolean
-          notifiable
+          acts_as_notifiable
           activist
           timestamps!
         end
@@ -57,7 +57,7 @@ describe UserNotification::Notifiable do
         class ActivistAndNotifiableArticle < ActiveRecord::Base
           self.table_name = 'articles'
           include UserNotification::Model
-          notifiable
+          acts_as_notifiable
           activist
 
           if ::ActiveRecord::VERSION::MAJOR < 4
@@ -159,7 +159,7 @@ describe UserNotification::Notifiable do
     end
   end
 
-  describe '#notifiable' do
+  describe '#acts_as_notifiable' do
     subject { article(options) }
     let(:options) { {} }
 
@@ -175,7 +175,7 @@ describe UserNotification::Notifiable do
 
             field :name, type: String
             field :published, type: Boolean
-            notifiable :skip_defaults => true
+            acts_as_notifiable :skip_defaults => true
           end
         when :mongo_mapper
           art = Class.new do
@@ -186,7 +186,7 @@ describe UserNotification::Notifiable do
 
             key :name, String
             key :published, Boolean
-            notifiable :skip_defaults => true
+            acts_as_notifiable :skip_defaults => true
 
             timestamps!
           end
@@ -232,7 +232,7 @@ describe UserNotification::Notifiable do
 
             field :name, type: String
             field :published, type: Boolean
-            notifiable :except => [:create]
+            acts_as_notifiable :except => [:create]
           end
         when :mongo_mapper
           art = Class.new do
@@ -243,7 +243,7 @@ describe UserNotification::Notifiable do
 
             key :name, String
             key :published, Boolean
-            notifiable :except => [:create]
+            acts_as_notifiable :except => [:create]
 
             timestamps!
           end
@@ -269,7 +269,7 @@ describe UserNotification::Notifiable do
             field :name, type: String
             field :published, type: Boolean
 
-            notifiable :only => [:create, :update]
+            acts_as_notifiable :only => [:create, :update]
           end
         when :mongo_mapper
           art = Class.new do
@@ -281,7 +281,7 @@ describe UserNotification::Notifiable do
             key :name, String
             key :published, Boolean
 
-            notifiable :only => [:create, :update]
+            acts_as_notifiable :only => [:create, :update]
           end
         when :active_record
           art = article({:only => [:create, :update]})
@@ -294,31 +294,31 @@ describe UserNotification::Notifiable do
 
     it 'accepts :owner option' do
       owner = mock('owner')
-      subject.notifiable(:owner => owner)
+      subject.acts_as_notifiable(:owner => owner)
       subject.notification_owner_global.must_equal owner
     end
 
     it 'accepts :params option' do
       params = {:a => 1}
-      subject.notifiable(:params => params)
+      subject.acts_as_notifiable(:params => params)
       subject.notification_params_global.must_equal params
     end
 
     it 'accepts :on option' do
       on = {:a => lambda{}, :b => proc {}}
-      subject.notifiable(:on => on)
+      subject.acts_as_notifiable(:on => on)
       subject.notification_hooks.must_equal on
     end
 
     it 'accepts :on option with string keys' do
       on = {'a' => lambda {}}
-      subject.notifiable(:on => on)
+      subject.acts_as_notifiable(:on => on)
       subject.notification_hooks.must_equal on.symbolize_keys
     end
 
     it 'accepts :on values that are procs' do
       on = {:unpassable => 1, :proper => lambda {}, :proper_proc => proc {}}
-      subject.notifiable(:on => on)
+      subject.acts_as_notifiable(:on => on)
       subject.notification_hooks.must_include :proper
       subject.notification_hooks.must_include :proper_proc
       subject.notification_hooks.wont_include :unpassable
@@ -350,7 +350,7 @@ describe UserNotification::Notifiable do
     end
 
     it 'allows hooks to decide if notification should be created' do
-      subject.notifiable
+      subject.acts_as_notifiable
       @article = subject.new(:name => 'Some Name')
       UserNotification.set_controller(mock('controller'))
       pf = proc { |model, controller|

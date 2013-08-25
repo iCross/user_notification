@@ -1,6 +1,6 @@
 module UserNotification
   # Main module extending classes we want to keep track of.
-  module Notifiable
+  module ActsAsNotifiable
     extend ActiveSupport::Concern
     # A shortcut method for setting custom key, owner and parameters of {Notification}
     # in one line. Accepts a hash with 3 keys:
@@ -37,10 +37,10 @@ module UserNotification
       nil
     end
 
-    # Module with basic +notifiable+ method that enables tracking models.
+    # Module with basic +acts_as_notifiable+ method that enables tracking models.
     module ClassMethods
       # Adds required callbacks for creating and updating
-      # notifiable models and adds +notifications+ relation for listing
+      # acts_as_notifiable models and adds +notifications+ relation for listing
       # associated notifications.
       #
       # == Parameters:
@@ -49,8 +49,8 @@ module UserNotification
       #   It can be a Proc, Symbol or an ActiveRecord object:
       #   == Examples:
       #
-      #    notifiable :owner => :author
-      #    notifiable :owner => proc {|o| o.author}
+      #    acts_as_notifiable :owner => :author
+      #    acts_as_notifiable :owner => proc {|o| o.author}
       #
       #   Keep in mind that owner relation is polymorphic, so you can't just
       #   provide id number of the owner object.
@@ -59,8 +59,8 @@ module UserNotification
       #   It can be a Proc, Symbol, or an ActiveRecord object
       #   == Examples:
       #
-      #    notifiable :recipient => :author
-      #    notifiable :recipient => proc {|o| o.author}
+      #    acts_as_notifiable :recipient => :author
+      #    acts_as_notifiable :recipient => proc {|o| o.author}
       #
       #   Keep in mind that recipient relation is polymorphic, so you can't just
       #   provide id number of the owner object.
@@ -70,7 +70,7 @@ module UserNotification
       #   == Example:
       #    class Article < ActiveRecord::Base
       #      include UserNotification::Model
-      #      notifiable :params => {
+      #      acts_as_notifiable :params => {
       #          :title => :title,
       #          :author_name => "Michael",
       #          :category_name => proc {|controller, model_instance| model_instance.category.name},
@@ -79,7 +79,7 @@ module UserNotification
       #    end
       #
       #   Values in the :params hash can either be an *exact* *value*, a *Proc/Lambda* executed before saving the notification or a *Symbol*
-      #   which is a an attribute or a method name executed on the notifiable model's instance.
+      #   which is a an attribute or a method name executed on the acts_as_notifiable model's instance.
       #
       #   Everything specified here has a lower priority than parameters
       #   specified directly in {#notification} method.
@@ -95,7 +95,7 @@ module UserNotification
       #   * _:update_
       #   * _:destroy_
       #   Selecting one or more of these will make UserNotification create notifications
-      #   automatically for the notifiable model on selected actions.
+      #   automatically for the acts_as_notifiable model on selected actions.
       #
       #   Resulting notifications will have have keys assigned to, respectively:
       #   * _article.create_
@@ -123,14 +123,14 @@ module UserNotification
       #
       #   == Example:
       #     # app/models/article.rb
-      #     notifiable :on => {:update => proc {|model, controller| model.published? }}
+      #     acts_as_notifiable :on => {:update => proc {|model, controller| model.published? }}
       #
       #   In the example above, given a model Article with boolean column _published_.
       #   The notifications with key _article.update_ will only be created
       #   if the published status is set to true on that article.
       # @param opts [Hash] options
       # @return [nil] options
-      def notifiable(opts = {})
+      def acts_as_notifiable(opts = {})
         options = opts.clone
 
         all_options = [:create, :update, :destroy]
