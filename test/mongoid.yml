@@ -3,4 +3,4 @@ test:
     default:
       hosts:
         - 127.0.0.1:27017
-      database: public_activity_test
+      database: user_notification_test

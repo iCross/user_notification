@@ -1,0 +1,1 @@
+../../lib/generators/user_notification/migration/templates/migration.rb

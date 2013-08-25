@@ -6,7 +6,7 @@ require 'rake/testtask'
 
 task :default => :test
 
-desc 'Generate documentation for the public_activity plugin.'
+desc 'Generate documentation for the user_notification plugin.'
 YARD::Rake::YardocTask.new do |doc|
   doc.files = ['lib/**/*.rb']
 end

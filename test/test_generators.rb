@@ -2,40 +2,29 @@ if ENV["PA_ORM"] == "active_record"
 
   require 'test_helper'
   require 'rails/generators/test_case'
-  require 'generators/public_activity/activity/activity_generator'
-  require 'generators/public_activity/migration/migration_generator'
-  require 'generators/public_activity/migration_upgrade/migration_upgrade_generator'
+  require 'generators/user_notification/notification/notification_generator'
+  require 'generators/user_notification/migration/migration_generator'
 
-  class TestActivityGenerator < Rails::Generators::TestCase
-    tests PublicActivity::Generators::ActivityGenerator
+  class TestNotificationGenerator < Rails::Generators::TestCase
+    tests UserNotification::Generators::NotificationGenerator
     destination File.expand_path("../tmp", File.dirname(__FILE__))
     setup :prepare_destination
 
-    def test_generating_activity_model
+    def test_generating_notification_model
       run_generator
-      assert_file "app/models/activity.rb"
+      assert_file "app/models/notification.rb"
     end
   end
 
   class TestMigrationGenerator < Rails::Generators::TestCase
-    tests PublicActivity::Generators::MigrationGenerator
+    tests UserNotification::Generators::MigrationGenerator
     destination File.expand_path("../tmp", File.dirname(__FILE__))
     setup :prepare_destination
 
-    def test_generating_activity_model
+    def test_generating_notification_model
       run_generator
-      assert_migration "db/migrate/create_activities.rb"
+      assert_migration "db/migrate/create_notifications.rb"
     end
   end
 
-  class TestMigrationUpgradeGenerator < Rails::Generators::TestCase
-    tests PublicActivity::Generators::MigrationUpgradeGenerator
-    destination File.expand_path("../tmp", File.dirname(__FILE__))
-    setup :prepare_destination
-
-    def test_generating_activity_model
-      run_generator
-      assert_migration "db/migrate/upgrade_activities.rb"
-    end
-  end
 end

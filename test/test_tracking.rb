@@ -1,6 +1,6 @@
 require 'test_helper'
 
-describe PublicActivity::Tracked do
+describe UserNotification::Tracked do
   describe 'defining instance options' do
     subject { article.new }
     let :options do
@@ -9,29 +9,29 @@ describe PublicActivity::Tracked do
         :owner => User.create,
         :recipient => User.create }
     end
-    before(:each) { subject.activity(options) }
-    let(:activity){ subject.save; subject.activities.last }
+    before(:each) { subject.notification(options) }
+    let(:notification){ subject.save; subject.notifications.last }
 
-    specify { subject.activity_key.must_be_same_as    options[:key] }
-    specify { activity.key.must_equal                 options[:key] }
+    specify { subject.notification_key.must_be_same_as    options[:key] }
+    specify { notification.key.must_equal                 options[:key] }
 
-    specify { subject.activity_owner.must_be_same_as  options[:owner] }
-    specify { activity.owner.must_equal               options[:owner] }
+    specify { subject.notification_owner.must_be_same_as  options[:owner] }
+    specify { notification.owner.must_equal               options[:owner] }
 
-    specify { subject.activity_params.must_be_same_as options[:params] }
-    specify { activity.parameters.must_equal          options[:params] }
+    specify { subject.notification_params.must_be_same_as options[:params] }
+    specify { notification.parameters.must_equal          options[:params] }
 
-    specify { subject.activity_recipient.must_be_same_as options[:recipient] }
-    specify { activity.recipient.must_equal              options[:recipient] }
+    specify { subject.notification_recipient.must_be_same_as options[:recipient] }
+    specify { notification.recipient.must_equal              options[:recipient] }
   end
 
   it 'can be tracked and be an activist at the same time' do
-    case PublicActivity.config.orm
+    case UserNotification.config.orm
       when :mongoid
         class ActivistAndTrackedArticle
           include Mongoid::Document
           include Mongoid::Timestamps
-          include PublicActivity::Model
+          include UserNotification::Model
 
           belongs_to :user
 
@@ -43,7 +43,7 @@ describe PublicActivity::Tracked do
       when :mongo_mapper
         class ActivistAndTrackedArticle
           include MongoMapper::Document
-          include PublicActivity::Model
+          include UserNotification::Model
 
           belongs_to :user
 
@@ -56,7 +56,7 @@ describe PublicActivity::Tracked do
       when :active_record
         class ActivistAndTrackedArticle < ActiveRecord::Base
           self.table_name = 'articles'
-          include PublicActivity::Model
+          include UserNotification::Model
           tracked
           activist
 
@@ -69,8 +69,8 @@ describe PublicActivity::Tracked do
 
     art = ActivistAndTrackedArticle.new
     art.save
-    art.activities.last.trackable_id.must_equal art.id
-    art.activities.last.owner_id.must_equal nil
+    art.notifications.last.trackable_id.must_equal art.id
+    art.notifications.last.owner_id.must_equal nil
   end
 
   describe 'custom fields' do
@@ -78,84 +78,84 @@ describe PublicActivity::Tracked do
       it 'should resolve symbols' do
         a = article(nonstandard: :name).new(name: 'Symbol resolved')
         a.save
-        a.activities.last.nonstandard.must_equal 'Symbol resolved'
+        a.notifications.last.nonstandard.must_equal 'Symbol resolved'
       end
 
       it 'should resolve procs' do
         a = article(nonstandard: proc {|_, model| model.name}).new(name: 'Proc resolved')
         a.save
-        a.activities.last.nonstandard.must_equal 'Proc resolved'
+        a.notifications.last.nonstandard.must_equal 'Proc resolved'
       end
     end
 
     describe 'instance' do
       it 'should resolve symbols' do
         a = article.new(name: 'Symbol resolved')
-        a.activity nonstandard: :name
+        a.notification nonstandard: :name
         a.save
-        a.activities.last.nonstandard.must_equal 'Symbol resolved'
+        a.notifications.last.nonstandard.must_equal 'Symbol resolved'
       end
 
       it 'should resolve procs' do
         a = article.new(name: 'Proc resolved')
-        a.activity nonstandard: proc {|_, model| model.name}
+        a.notification nonstandard: proc {|_, model| model.name}
         a.save
-        a.activities.last.nonstandard.must_equal 'Proc resolved'
+        a.notifications.last.nonstandard.must_equal 'Proc resolved'
       end
     end
   end
 
-  it 'should reset instance options on successful create_activity' do
+  it 'should reset instance options on successful create_notification' do
     a = article.new
-    a.activity key: 'test', params: {test: 1}
+    a.notification key: 'test', params: {test: 1}
     a.save
-    a.activities.count.must_equal 1
-    ->{a.create_activity}.must_raise PublicActivity::NoKeyProvided
-    a.activity_params.must_be_empty
-    a.activity key: 'asd'
-    a.create_activity
-    ->{a.create_activity}.must_raise PublicActivity::NoKeyProvided
+    a.notifications.count.must_equal 1
+    ->{a.create_notification}.must_raise UserNotification::NoKeyProvided
+    a.notification_params.must_be_empty
+    a.notification key: 'asd'
+    a.create_notification
+    ->{a.create_notification}.must_raise UserNotification::NoKeyProvided
   end
 
   it 'should not accept global key option' do
     # this example tests the lack of presence of sth that should not be here
     a = article(key: 'asd').new
     a.save
-    ->{a.create_activity}.must_raise PublicActivity::NoKeyProvided
-    a.activities.count.must_equal 1
+    ->{a.create_notification}.must_raise UserNotification::NoKeyProvided
+    a.notifications.count.must_equal 1
   end
 
   it 'should not change global custom fields' do
     a = article(nonstandard: 'global').new
-    a.activity nonstandard: 'instance'
+    a.notification nonstandard: 'instance'
     a.save
-    a.class.activity_custom_fields_global.must_equal nonstandard: 'global'
+    a.class.notification_custom_fields_global.must_equal nonstandard: 'global'
   end
 
   describe 'disabling functionality' do
     it 'allows for global disable' do
-      PublicActivity.enabled = false
-      activity_count_before = PublicActivity::Activity.count
+      UserNotification.enabled = false
+      notification_count_before = UserNotification::Notification.count
 
       @article = article().new
       @article.save
-      PublicActivity::Activity.count.must_equal activity_count_before
+      UserNotification::Notification.count.must_equal notification_count_before
 
-      PublicActivity.enabled = true
+      UserNotification.enabled = true
     end
 
     it 'allows for class-wide disable' do
-      activity_count_before = PublicActivity::Activity.count
+      notification_count_before = UserNotification::Notification.count
 
       klass = article
-      klass.public_activity_off
+      klass.user_notification_off
       @article = klass.new
       @article.save
-      PublicActivity::Activity.count.must_equal activity_count_before
+      UserNotification::Notification.count.must_equal notification_count_before
 
-      klass.public_activity_on
+      klass.user_notification_on
       @article.save
-      PublicActivity::Activity.count.must_be :>, activity_count_before
+      UserNotification::Notification.count.must_be :>, notification_count_before
     end
   end
 
@@ -164,12 +164,12 @@ describe PublicActivity::Tracked do
     let(:options) { {} }
 
     it 'allows skipping the tracking on CRUD actions' do
-      case PublicActivity.config.orm
+      case UserNotification.config.orm
         when :mongoid
           art = Class.new do
             include Mongoid::Document
             include Mongoid::Timestamps
-            include PublicActivity::Model
+            include UserNotification::Model
 
             belongs_to :user
 
@@ -180,7 +180,7 @@ describe PublicActivity::Tracked do
         when :mongo_mapper
           art = Class.new do
             include MongoMapper::Document
-            include PublicActivity::Model
+            include UserNotification::Model
 
             belongs_to :user
 
@@ -194,39 +194,39 @@ describe PublicActivity::Tracked do
           art = article(:skip_defaults => true)
       end
 
-      art.must_include PublicActivity::Common
-      art.wont_include PublicActivity::Creation
-      art.wont_include PublicActivity::Update
-      art.wont_include PublicActivity::Destruction
+      art.must_include UserNotification::Common
+      art.wont_include UserNotification::Creation
+      art.wont_include UserNotification::Update
+      art.wont_include UserNotification::Destruction
     end
 
     describe 'default options' do
       subject { article }
 
-      specify { subject.must_include PublicActivity::Creation }
-      specify { subject.must_include PublicActivity::Destruction }
-      specify { subject.must_include PublicActivity::Update }
+      specify { subject.must_include UserNotification::Creation }
+      specify { subject.must_include UserNotification::Destruction }
+      specify { subject.must_include UserNotification::Update }
 
       specify { subject._create_callbacks.select do |c|
-        c.kind.eql?(:after) && c.filter == :activity_on_create
+        c.kind.eql?(:after) && c.filter == :notification_on_create
       end.wont_be_empty }
 
       specify { subject._update_callbacks.select do |c|
-        c.kind.eql?(:after) && c.filter == :activity_on_update
+        c.kind.eql?(:after) && c.filter == :notification_on_update
       end.wont_be_empty }
 
       specify { subject._destroy_callbacks.select do |c|
-        c.kind.eql?(:before) && c.filter == :activity_on_destroy
+        c.kind.eql?(:before) && c.filter == :notification_on_destroy
       end.wont_be_empty }
     end
 
     it 'accepts :except option' do
-      case PublicActivity.config.orm
+      case UserNotification.config.orm
         when :mongoid
           art = Class.new do
             include Mongoid::Document
             include Mongoid::Timestamps
-            include PublicActivity::Model
+            include UserNotification::Model
 
             belongs_to :user
 
@@ -237,7 +237,7 @@ describe PublicActivity::Tracked do
         when :mongo_mapper
           art = Class.new do
             include MongoMapper::Document
-            include PublicActivity::Model
+            include UserNotification::Model
 
             belongs_to :user
 
@@ -251,18 +251,18 @@ describe PublicActivity::Tracked do
           art = article(:except => [:create])
       end
 
-      art.wont_include PublicActivity::Creation
-      art.must_include PublicActivity::Update
-      art.must_include PublicActivity::Destruction
+      art.wont_include UserNotification::Creation
+      art.must_include UserNotification::Update
+      art.must_include UserNotification::Destruction
     end
 
     it 'accepts :only option' do
-      case PublicActivity.config.orm
+      case UserNotification.config.orm
         when :mongoid
           art = Class.new do
             include Mongoid::Document
             include Mongoid::Timestamps
-            include PublicActivity::Model
+            include UserNotification::Model
 
             belongs_to :user
 
@@ -274,7 +274,7 @@ describe PublicActivity::Tracked do
         when :mongo_mapper
           art = Class.new do
             include MongoMapper::Document
-            include PublicActivity::Model
+            include UserNotification::Model
 
             belongs_to :user
 
@@ -287,54 +287,54 @@ describe PublicActivity::Tracked do
           art = article({:only => [:create, :update]})
       end
 
-      art.must_include PublicActivity::Creation
-      art.wont_include PublicActivity::Destruction
-      art.must_include PublicActivity::Update
+      art.must_include UserNotification::Creation
+      art.wont_include UserNotification::Destruction
+      art.must_include UserNotification::Update
     end
 
     it 'accepts :owner option' do
       owner = mock('owner')
       subject.tracked(:owner => owner)
-      subject.activity_owner_global.must_equal owner
+      subject.notification_owner_global.must_equal owner
     end
 
     it 'accepts :params option' do
       params = {:a => 1}
       subject.tracked(:params => params)
-      subject.activity_params_global.must_equal params
+      subject.notification_params_global.must_equal params
     end
 
     it 'accepts :on option' do
       on = {:a => lambda{}, :b => proc {}}
       subject.tracked(:on => on)
-      subject.activity_hooks.must_equal on
+      subject.notification_hooks.must_equal on
     end
 
     it 'accepts :on option with string keys' do
       on = {'a' => lambda {}}
       subject.tracked(:on => on)
-      subject.activity_hooks.must_equal on.symbolize_keys
+      subject.notification_hooks.must_equal on.symbolize_keys
     end
 
     it 'accepts :on values that are procs' do
       on = {:unpassable => 1, :proper => lambda {}, :proper_proc => proc {}}
       subject.tracked(:on => on)
-      subject.activity_hooks.must_include :proper
-      subject.activity_hooks.must_include :proper_proc
-      subject.activity_hooks.wont_include :unpassable
+      subject.notification_hooks.must_include :proper
+      subject.notification_hooks.must_include :proper_proc
+      subject.notification_hooks.wont_include :unpassable
     end
 
     describe 'global options' do
       subject { article(recipient: :test, owner: :test2, params: {a: 'b'}) }
 
-      specify { subject.activity_recipient_global.must_equal :test }
-      specify { subject.activity_owner_global.must_equal :test2    }
-      specify { subject.activity_params_global.must_equal(a: 'b')  }
+      specify { subject.notification_recipient_global.must_equal :test }
+      specify { subject.notification_owner_global.must_equal :test2    }
+      specify { subject.notification_params_global.must_equal(a: 'b')  }
     end
   end
 
-  describe 'activity hooks' do
-    subject { s = article; s.activity_hooks = {:test => hook}; s }
+  describe 'notification hooks' do
+    subject { s = article; s.notification_hooks = {:test => hook}; s }
     let(:hook) { lambda {} }
 
     it 'retrieves hooks' do
@@ -349,30 +349,30 @@ describe PublicActivity::Tracked do
       nil.must_be_same_as subject.get_hook(:nonexistent)
     end
 
-    it 'allows hooks to decide if activity should be created' do
+    it 'allows hooks to decide if notification should be created' do
       subject.tracked
       @article = subject.new(:name => 'Some Name')
-      PublicActivity.set_controller(mock('controller'))
+      UserNotification.set_controller(mock('controller'))
       pf = proc { |model, controller|
-        controller.must_be_same_as PublicActivity.get_controller
+        controller.must_be_same_as UserNotification.get_controller
         model.name.must_equal 'Some Name'
         false
       }
       pt = proc { |model, controller|
-        controller.must_be_same_as PublicActivity.get_controller
+        controller.must_be_same_as UserNotification.get_controller
         model.name.must_equal 'Other Name'
-        true # this will save the activity with *.update key
+        true # this will save the notification with *.update key
       }
-      @article.class.activity_hooks = {:create => pf, :update => pt, :destroy => pt}
+      @article.class.notification_hooks = {:create => pf, :update => pt, :destroy => pt}
 
-      @article.activities.to_a.must_be_empty
+      @article.notifications.to_a.must_be_empty
       @article.save # create
       @article.name = 'Other Name'
       @article.save # update
       @article.destroy # destroy
 
-      @article.activities.count.must_equal 2
-      @article.activities.first.key.must_equal 'article.update'
+      @article.notifications.count.must_equal 2
+      @article.notifications.first.key.must_equal 'article.update'
     end
   end
 end

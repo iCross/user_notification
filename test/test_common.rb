@@ -1,6 +1,6 @@
 require 'test_helper'
 
-describe PublicActivity::Common do
+describe UserNotification::Common do
   before do
     @owner     = User.create(:name => "Peter Pan")
     @recipient = User.create(:name => "Bruce Wayne")
@@ -10,104 +10,104 @@ describe PublicActivity::Common do
   end
   subject { article(@options).new }
 
-  it 'prioritizes parameters passed to #create_activity' do
+  it 'prioritizes parameters passed to #create_notification' do
     subject.save
-    subject.create_activity(:test, params: {author_name: 'Pan'}).parameters[:author_name].must_equal 'Pan'
-    subject.create_activity(:test, parameters: {author_name: 'Pan'}).parameters[:author_name].must_equal 'Pan'
-    subject.create_activity(:test, params: {author_name: nil}).parameters[:author_name].must_be_nil
-    subject.create_activity(:test, parameters: {author_name: nil}).parameters[:author_name].must_be_nil
+    subject.create_notification(:test, params: {author_name: 'Pan'}).parameters[:author_name].must_equal 'Pan'
+    subject.create_notification(:test, parameters: {author_name: 'Pan'}).parameters[:author_name].must_equal 'Pan'
+    subject.create_notification(:test, params: {author_name: nil}).parameters[:author_name].must_be_nil
+    subject.create_notification(:test, parameters: {author_name: nil}).parameters[:author_name].must_be_nil
   end
 
-  it 'prioritizes owner passed to #create_activity' do
+  it 'prioritizes owner passed to #create_notification' do
     subject.save
-    subject.create_activity(:test, owner: @recipient).owner.must_equal @recipient
-    subject.create_activity(:test, owner: nil).owner.must_be_nil
+    subject.create_notification(:test, owner: @recipient).owner.must_equal @recipient
+    subject.create_notification(:test, owner: nil).owner.must_be_nil
   end
 
-  it 'prioritizes recipient passed to #create_activity' do
+  it 'prioritizes recipient passed to #create_notification' do
     subject.save
-    subject.create_activity(:test, recipient: @owner).recipient.must_equal @owner
-    subject.create_activity(:test, recipient: nil).recipient.must_be_nil
+    subject.create_notification(:test, recipient: @owner).recipient.must_equal @owner
+    subject.create_notification(:test, recipient: nil).recipient.must_be_nil
   end
 
   it 'uses global fields' do
     subject.save
-    activity = subject.activities.last
-    activity.parameters.must_equal @options[:params]
-    activity.owner.must_equal @owner
+    notification = subject.notifications.last
+    notification.parameters.must_equal @options[:params]
+    notification.owner.must_equal @owner
   end
 
   it 'allows custom fields' do
     subject.save
-    subject.create_activity :with_custom_fields, nonstandard: "Custom allowed"
-    subject.activities.last.nonstandard.must_equal "Custom allowed"
+    subject.create_notification :with_custom_fields, nonstandard: "Custom allowed"
+    subject.notifications.last.nonstandard.must_equal "Custom allowed"
   end
 
-  it '#create_activity returns a new activity object' do
+  it '#create_notification returns a new notification object' do
     subject.save
-    subject.create_activity("some.key").wont_be_nil
+    subject.create_notification("some.key").wont_be_nil
   end
 
-  it 'allows passing owner through #create_activity' do
+  it 'allows passing owner through #create_notification' do
     article = article().new
     article.save
-    activity = article.create_activity("some.key", :owner => @owner)
-    activity.owner.must_equal @owner
+    notification = article.create_notification("some.key", :owner => @owner)
+    notification.owner.must_equal @owner
   end
 
   it 'allows resolving custom fields' do
     subject.name      = "Resolving is great"
     subject.published = true
     subject.save
-    subject.create_activity :with_custom_fields, nonstandard: :name
-    subject.activities.last.nonstandard.must_equal "Resolving is great"
-    subject.create_activity :with_custom_fields_2, nonstandard: proc {|_, model| model.published.to_s}
-    subject.activities.last.nonstandard.must_equal "true"
+    subject.create_notification :with_custom_fields, nonstandard: :name
+    subject.notifications.last.nonstandard.must_equal "Resolving is great"
+    subject.create_notification :with_custom_fields_2, nonstandard: proc {|_, model| model.published.to_s}
+    subject.notifications.last.nonstandard.must_equal "true"
   end
 
   it 'inherits instance parameters' do
-    subject.activity :params => {:author_name => "Michael"}
+    subject.notification :params => {:author_name => "Michael"}
     subject.save
-    activity = subject.activities.last
+    notification = subject.notifications.last
 
-    activity.parameters[:author_name].must_equal "Michael"
+    notification.parameters[:author_name].must_equal "Michael"
   end
 
   it 'accepts instance recipient' do
-    subject.activity :recipient => @recipient
+    subject.notification :recipient => @recipient
     subject.save
-    subject.activities.last.recipient.must_equal @recipient
+    subject.notifications.last.recipient.must_equal @recipient
   end
 
   it 'accepts instance owner' do
-    subject.activity :owner => @owner
+    subject.notification :owner => @owner
     subject.save
-    subject.activities.last.owner.must_equal @owner
+    subject.notifications.last.owner.must_equal @owner
   end
 
   it 'accepts owner as a symbol' do
     klass = article(:owner => :user)
     @article = klass.new(:user => @owner)
     @article.save
-    activity = @article.activities.last
+    notification = @article.notifications.last
 
-    activity.owner.must_equal @owner
+    notification.owner.must_equal @owner
   end
 
   describe '#extract_key' do
-    describe 'for class#activity_key method' do
+    describe 'for class#notification_key method' do
       before do
         @article = article(:owner => :user).new(:user => @owner)
       end
 
-      it 'assigns key to value of activity_key if set' do
-        def @article.activity_key; "my_custom_key" end
+      it 'assigns key to value of notification_key if set' do
+        def @article.notification_key; "my_custom_key" end
 
         @article.extract_key(:create, {}).must_equal "my_custom_key"
       end
 
       it 'assigns key based on class name as fallback' do
-        def @article.activity_key; nil end
+        def @article.notification_key; nil end
 
         @article.extract_key(:create).must_equal "article.create"
       end
@@ -147,7 +147,7 @@ describe PublicActivity::Common do
   end
 
   # no key implicated or given
-  specify { ->{subject.prepare_settings}.must_raise PublicActivity::NoKeyProvided }
+  specify { ->{subject.prepare_settings}.must_raise UserNotification::NoKeyProvided }
 
   describe 'resolving values' do
     it 'allows procs with models and controllers' do
@@ -155,13 +155,13 @@ describe PublicActivity::Common do
       context.expects(:accessor).times(2).returns(5)
       controller = mock('controller')
       controller.expects(:current_user).returns(:cu)
-      PublicActivity.set_controller(controller)
+      UserNotification.set_controller(controller)
       p = proc {|controller, model|
         assert_equal :cu, controller.current_user
         assert_equal 5, model.accessor
       }
-      PublicActivity.resolve_value(context, p)
-      PublicActivity.resolve_value(context, :accessor)
+      UserNotification.resolve_value(context, p)
+      UserNotification.resolve_value(context, :accessor)
     end
   end
 

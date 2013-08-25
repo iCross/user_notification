@@ -10,13 +10,13 @@ unless ENV['NOCOV']
 end
 $:.unshift File.expand_path('../../lib/', __FILE__)
 require 'active_support/testing/setup_and_teardown'
-require 'public_activity'
+require 'user_notification'
 require 'minitest/autorun'
 require 'minitest/pride' if ENV['WITH_PRIDE'] or ENV['PRIDE']
 
-PublicActivity::Config.orm = (ENV['PA_ORM'] || :active_record)
+UserNotification::Config.orm = (ENV['PA_ORM'] || :active_record)
 
-case PublicActivity::Config.orm
+case UserNotification::Config.orm
 when :active_record
   require 'active_record'
   require 'active_record/connection_adapters/sqlite3_adapter'
@@ -29,7 +29,7 @@ when :active_record
   def article(options = {})
     klass = Class.new(ActiveRecord::Base) do
       self.table_name = 'articles'
-      include PublicActivity::Model
+      include UserNotification::Model
       tracked options
       belongs_to :user
 
@@ -46,7 +46,7 @@ when :active_record
   class User < ActiveRecord::Base; end
 
   if ::ActiveRecord::VERSION::MAJOR < 4
-    PublicActivity::Activity.class_eval do
+    UserNotification::Notification.class_eval do
       attr_accessible :nonstandard
     end
   end
@@ -67,7 +67,7 @@ when :mongoid
   class Article
     include Mongoid::Document
     include Mongoid::Timestamps
-    include PublicActivity::Model
+    include UserNotification::Model
 
     belongs_to :user
 
@@ -77,7 +77,7 @@ when :mongoid
 
   def article(options = {})
     Article.class_eval do
-      set_public_activity_class_defaults
+      set_user_notification_class_defaults
       tracked options
     end
     Article
@@ -100,7 +100,7 @@ when :mongo_mapper
 
   class Article
     include MongoMapper::Document
-    include PublicActivity::Model
+    include UserNotification::Model
 
     belongs_to :user
 
@@ -110,7 +110,7 @@ when :mongo_mapper
 
   def article(options = {})
     Article.class_eval do
-      set_public_activity_class_defaults
+      set_user_notification_class_defaults
       tracked options
     end
     Article

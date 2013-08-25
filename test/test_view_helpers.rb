@@ -1,20 +1,20 @@
 require 'test_helper'
 
 describe 'ViewHelpers Rendering' do
-  include PublicActivity::ViewHelpers
+  include UserNotification::ViewHelpers
 
   # is this a proper test?
-  it 'provides render_activity helper' do
-    activity = mock('activity')
-    activity.stubs(:is_a?).with(PublicActivity::Activity).returns(true)
-    activity.expects(:render).with(self, {})
-    render_activity(activity)
+  it 'provides render_notification helper' do
+    notification = mock('notification')
+    notification.stubs(:is_a?).with(UserNotification::Notification).returns(true)
+    notification.expects(:render).with(self, {})
+    render_notification(notification)
   end
 
-  it 'handles multiple activities' do
-    activity = mock('activity')
-    activity.expects(:render).with(self, {})
-    render_activities([activity])
+  it 'handles multiple notifications' do
+    notification = mock('notification')
+    notification.expects(:render).with(self, {})
+    render_notifications([notification])
   end
 
   it 'flushes content_for between partials renderes' do
