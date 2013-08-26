@@ -11,12 +11,13 @@ module UserNotification
         # Define ownership to a resource responsible for this notification
         belongs_to :owner, :polymorphic => true
         # Define ownership to a resource targeted by this notification
-        belongs_to :recipient, :polymorphic => true
+        has_many :recipients, :through => :notifyings
+        has_many :notifyings, class_name: '::UserNotification::Notifying'
         # Serialize parameters Hash
         serialize :parameters, Hash
 
         if ::ActiveRecord::VERSION::MAJOR < 4
-          attr_accessible :key, :owner, :parameters, :recipient, :notifiable
+          attr_accessible :key, :owner, :parameters, :recipients, :notifiable
         end
       end
     end

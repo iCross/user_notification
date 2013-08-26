@@ -1,4 +1,3 @@
-require 'mongo_mapper'
 require 'active_support/core_ext'
 
 module UserNotification
@@ -21,7 +20,7 @@ module UserNotification
         # Define ownership to a resource responsible for this notification
         belongs_to :owner,      polymorphic: true
         # Define ownership to a resource targeted by this notification
-        belongs_to :recipient,  polymorphic: true
+        many :recipients,  in: :recipient_ids, class_name: 'User'
 
         key :key,         String
         key :parameters,  SymbolHash

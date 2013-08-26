@@ -10,17 +10,18 @@ module UserNotification
   extend ActiveSupport::Autoload
 
   autoload :Notification,     'user_notification/models/notification'
-  autoload :Activist,     'user_notification/models/activist'
-  autoload :Adapter,      'user_notification/models/adapter'
-  autoload :Notifiable,    'user_notification/models/notifiable'
+  autoload :Activist,         'user_notification/models/activist'
+  autoload :Adapter,          'user_notification/models/adapter'
+  autoload :Notifiable,       'user_notification/models/notifiable'
+  autoload :Notifying,        'user_notification/models/notifying'
   autoload :Common
   autoload :Config
-  autoload :Creation,     'user_notification/actions/creation.rb'
-  autoload :Deactivatable,'user_notification/roles/deactivatable.rb'
-  autoload :Destruction,  'user_notification/actions/destruction.rb'
+  autoload :Creation,         'user_notification/actions/creation.rb'
+  autoload :Deactivatable,    'user_notification/roles/deactivatable.rb'
+  autoload :Destruction,      'user_notification/actions/destruction.rb'
   autoload :Renderable
-  autoload :ActsAsNotifiable,      'user_notification/roles/acts_as_notifiable.rb'
-  autoload :Update,       'user_notification/actions/update.rb'
+  autoload :ActsAsNotifiable, 'user_notification/roles/acts_as_notifiable.rb'
+  autoload :Update,           'user_notification/actions/update.rb'
   autoload :VERSION
 
   # Switches UserNotification on or off.

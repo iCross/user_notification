@@ -10,7 +10,8 @@ module UserNotification
       argument :name, :type => :string, :default => 'create_notifications'
       # Create migration in project's folder
       def generate_files
-        migration_template 'migration.rb', "db/migrate/#{name}"
+        migration_template 'create_notifications.rb', "db/migrate/#{name}"
+        migration_template 'create_notifyings.rb', "db/migrate/#{name}"
       end
     end
   end

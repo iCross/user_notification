@@ -23,7 +23,7 @@ module UserNotification
 
     included do
       include Notifiable
-      class_attribute :notification_owner_global, :notification_recipient_global,
+      class_attribute :notification_owner_global, :notification_recipients_global,
                       :notification_params_global, :notification_hooks, :notification_custom_fields_global
       set_user_notification_class_defaults
     end
@@ -35,9 +35,9 @@ module UserNotification
     #   @see #notification_owner
     #   @return [Model]
 
-    # @!attribute notification_recipient_global
-    #   Global version of notification recipient
-    #   @see #notification_recipient
+    # @!attribute notification_recipients_global
+    #   Global version of notification recipients
+    #   @see #notification_recipients
     #   @return [Model]
 
     # @!attribute notification_params_global
@@ -88,14 +88,14 @@ module UserNotification
     attr_accessor :notification_owner
     @notification_owner = nil
 
-    # Set or get recipient for notification.
+    # Set or get recipients for notification.
     #
     # Association is polymorphic, thus allowing assignment of
     # all types of models. This can be used for example in the case of sending
     # private notifications for only a single user.
     # @return (see #notification_owner)
-    attr_accessor :notification_recipient
-    @notification_recipient = nil
+    attr_accessor :notification_recipients
+    @notification_recipients = nil
     # Set or get custom i18n key passed to {Notification}, later used in {Renderable#text}
     #
     # == Usage:
@@ -127,7 +127,7 @@ module UserNotification
       # @api private
       def set_user_notification_class_defaults
         self.notification_owner_global             = nil
-        self.notification_recipient_global         = nil
+        self.notification_recipients_global        = []
         self.notification_params_global            = {}
         self.notification_hooks                    = {}
         self.notification_custom_fields_global     = {}
@@ -233,7 +233,7 @@ module UserNotification
     #   @param [Hash] options Options with quality higher than instance options
     #     set in {Notifiable#notification}
     #   @option options [Activist] :owner Owner
-    #   @option options [Activist] :recipient Recipient
+    #   @option options [Activist] :recipients Recipient
     #   @option options [Hash] :params Parameters, see
     #     {UserNotification.resolve_value}
     # @overload create_notification(options = {})
@@ -242,7 +242,7 @@ module UserNotification
     #   @option options [Symbol,String] :action Name of the action
     #   @option options [String] :key Full key
     #   @option options [Activist] :owner Owner
-    #   @option options [Activist] :recipient Recipient
+    #   @option options [Activist] :recipients Recipient
     #   @option options [Hash] :params Parameters, see
     #     {UserNotification.resolve_value}
     def create_notification(*args)
@@ -292,10 +292,10 @@ module UserNotification
         )
       )
 
-      # recipient of the notification
-      options[:recipient] = UserNotification.resolve_value(self,
-        (all_options.has_key?(:recipient) ? all_options[:recipient] : (
-          self.notification_recipient || self.class.notification_recipient_global
+      # recipients of the notification
+      options[:recipients] = UserNotification.resolve_value(self,
+        (all_options.has_key?(:recipients) ? all_options[:recipients] : (
+          self.notification_recipients || self.class.notification_recipients_global
           )
         )
       )
@@ -335,7 +335,7 @@ module UserNotification
       @notification_params = {}
       @notification_key = nil
       @notification_owner = nil
-      @notification_recipient = nil
+      @notification_recipients = []
       @notification_custom_fields = {}
     end
   end

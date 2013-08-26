@@ -6,7 +6,7 @@ describe UserNotification::Common do
     @recipient = User.create(:name => "Bruce Wayne")
     @options   = {:params => {:author_name => "Peter",
                   :summary => "Default summary goes here..."},
-                  :owner => @owner, :recipient => @recipient}
+                  :owner => @owner, :recipients => [@recipient] }
   end
   subject { article(@options).new }
 
@@ -26,8 +26,8 @@ describe UserNotification::Common do
 
   it 'prioritizes recipient passed to #create_notification' do
     subject.save
-    subject.create_notification(:test, recipient: @owner).recipient.must_equal @owner
-    subject.create_notification(:test, recipient: nil).recipient.must_be_nil
+    subject.create_notification(:test, recipients: [@owner]).recipients.first.must_equal @owner
+    subject.create_notification(:test, recipients: []).recipients.must_be_empty
   end
 
   it 'uses global fields' do
@@ -74,9 +74,9 @@ describe UserNotification::Common do
   end
 
   it 'accepts instance recipient' do
-    subject.notification :recipient => @recipient
+    subject.notification :recipients => [ @recipient ]
     subject.save
-    subject.notifications.last.recipient.must_equal @recipient
+    subject.notifications.last.recipients.first.must_equal @recipient
   end
 
   it 'accepts instance owner' do

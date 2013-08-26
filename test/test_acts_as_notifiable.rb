@@ -7,7 +7,7 @@ describe UserNotification::ActsAsNotifiable do
       { :key => 'key',
         :params => {:a => 1},
         :owner => User.create,
-        :recipient => User.create }
+        :recipients => [ User.create ] }
     end
     before(:each) { subject.notification(options) }
     let(:notification){ subject.save; subject.notifications.last }
@@ -21,8 +21,8 @@ describe UserNotification::ActsAsNotifiable do
     specify { subject.notification_params.must_be_same_as options[:params] }
     specify { notification.parameters.must_equal          options[:params] }
 
-    specify { subject.notification_recipient.must_be_same_as options[:recipient] }
-    specify { notification.recipient.must_equal              options[:recipient] }
+    specify { subject.notification_recipients.must_be_same_as options[:recipients] }
+    specify { notification.recipients.must_equal              options[:recipients] }
   end
 
   it 'can be acts_as_notifiable and be an activist at the same time' do
@@ -325,9 +325,9 @@ describe UserNotification::ActsAsNotifiable do
     end
 
     describe 'global options' do
-      subject { article(recipient: :test, owner: :test2, params: {a: 'b'}) }
+      subject { article(recipients: [:test], owner: :test2, params: {a: 'b'}) }
 
-      specify { subject.notification_recipient_global.must_equal :test }
+      specify { subject.notification_recipients_global.must_equal [:test] }
       specify { subject.notification_owner_global.must_equal :test2    }
       specify { subject.notification_params_global.must_equal(a: 'b')  }
     end

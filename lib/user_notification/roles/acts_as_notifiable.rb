@@ -14,8 +14,8 @@ module UserNotification
     #   See {Common#notification_owner}
     # [:params]
     #   See {Common#notification_params}
-    # [:recipient]
-    #   Set the recipient for this notification. Useful for private notifications, which should only be visible to a certain user. See {Common#notification_recipient}.
+    # [:recipients]
+    #   Set the recipients for this notification. Useful for private notifications, which should only be visible to a certain user. See {Common#notification_recipient}.
     # @example
     #
     #   @article = Article.new
@@ -32,7 +32,7 @@ module UserNotification
       self.notification_key = rest.delete(:key) if rest[:key]
       self.notification_owner = rest.delete(:owner) if rest[:owner]
       self.notification_params = rest.delete(:params) if rest[:params]
-      self.notification_recipient = rest.delete(:recipient) if rest[:recipient]
+      self.notification_recipients = rest.delete(:recipients) if rest[:recipients]
       self.notification_custom_fields = rest if rest.count > 0
       nil
     end
@@ -54,13 +54,13 @@ module UserNotification
       #
       #   Keep in mind that owner relation is polymorphic, so you can't just
       #   provide id number of the owner object.
-      # [:recipient]
-      #   Specify the recipient of the {Notification}
+      # [:recipients]
+      #   Specify the recipients of the {Notification}
       #   It can be a Proc, Symbol, or an ActiveRecord object
       #   == Examples:
       #
-      #    acts_as_notifiable :recipient => :author
-      #    acts_as_notifiable :recipient => proc {|o| o.author}
+      #    acts_as_notifiable :recipients => [ :author ]
+      #    acts_as_notifiable :recipients => proc {|o| [ o.author ] }
       #
       #   Keep in mind that recipient relation is polymorphic, so you can't just
       #   provide id number of the owner object.
@@ -162,8 +162,8 @@ module UserNotification
         if options[:owner]
           self.notification_owner_global = options.delete(:owner)
         end
-        if options[:recipient]
-          self.notification_recipient_global = options.delete(:recipient)
+        if options[:recipients]
+          self.notification_recipients_global = options.delete(:recipients)
         end
         if options[:params]
           self.notification_params_global = options.delete(:params)
