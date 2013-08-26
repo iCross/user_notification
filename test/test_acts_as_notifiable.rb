@@ -27,32 +27,6 @@ describe UserNotification::ActsAsNotifiable do
 
   it 'can be acts_as_notifiable and be an activist at the same time' do
     case UserNotification.config.orm
-      when :mongoid
-        class ActivistAndNotifiableArticle
-          include Mongoid::Document
-          include Mongoid::Timestamps
-          include UserNotification::Model
-
-          belongs_to :user
-
-          field :name, type: String
-          field :published, type: Boolean
-          acts_as_notifiable
-          acts_as_activist
-        end
-      when :mongo_mapper
-        class ActivistAndNotifiableArticle
-          include MongoMapper::Document
-          include UserNotification::Model
-
-          belongs_to :user
-
-          key :name, String
-          key :published, Boolean
-          acts_as_notifiable
-          acts_as_activist
-          timestamps!
-        end
       when :active_record
         class ActivistAndNotifiableArticle < ActiveRecord::Base
           self.table_name = 'articles'
@@ -165,31 +139,6 @@ describe UserNotification::ActsAsNotifiable do
 
     it 'allows skipping the tracking on CRUD actions' do
       case UserNotification.config.orm
-        when :mongoid
-          art = Class.new do
-            include Mongoid::Document
-            include Mongoid::Timestamps
-            include UserNotification::Model
-
-            belongs_to :user
-
-            field :name, type: String
-            field :published, type: Boolean
-            acts_as_notifiable :skip_defaults => true
-          end
-        when :mongo_mapper
-          art = Class.new do
-            include MongoMapper::Document
-            include UserNotification::Model
-
-            belongs_to :user
-
-            key :name, String
-            key :published, Boolean
-            acts_as_notifiable :skip_defaults => true
-
-            timestamps!
-          end
         when :active_record
           art = article(:skip_defaults => true)
       end
@@ -222,31 +171,6 @@ describe UserNotification::ActsAsNotifiable do
 
     it 'accepts :except option' do
       case UserNotification.config.orm
-        when :mongoid
-          art = Class.new do
-            include Mongoid::Document
-            include Mongoid::Timestamps
-            include UserNotification::Model
-
-            belongs_to :user
-
-            field :name, type: String
-            field :published, type: Boolean
-            acts_as_notifiable :except => [:create]
-          end
-        when :mongo_mapper
-          art = Class.new do
-            include MongoMapper::Document
-            include UserNotification::Model
-
-            belongs_to :user
-
-            key :name, String
-            key :published, Boolean
-            acts_as_notifiable :except => [:create]
-
-            timestamps!
-          end
         when :active_record
           art = article(:except => [:create])
       end
@@ -258,31 +182,6 @@ describe UserNotification::ActsAsNotifiable do
 
     it 'accepts :only option' do
       case UserNotification.config.orm
-        when :mongoid
-          art = Class.new do
-            include Mongoid::Document
-            include Mongoid::Timestamps
-            include UserNotification::Model
-
-            belongs_to :user
-
-            field :name, type: String
-            field :published, type: Boolean
-
-            acts_as_notifiable :only => [:create, :update]
-          end
-        when :mongo_mapper
-          art = Class.new do
-            include MongoMapper::Document
-            include UserNotification::Model
-
-            belongs_to :user
-
-            key :name, String
-            key :published, Boolean
-
-            acts_as_notifiable :only => [:create, :update]
-          end
         when :active_record
           art = article({:only => [:create, :update]})
       end

@@ -9,17 +9,9 @@ describe UserNotification::Activist do
     case ENV["PA_ORM"]
       when "active_record"
         klass.reflect_on_association(:notifications_as_owner).options[:as].must_equal :owner
-      when "mongoid"
-        klass.reflect_on_association(:notifications_as_owner).options[:inverse_of].must_equal :owner
-      when "mongo_mapper"
-        klass.associations[:notifications_as_owner].options[:as].must_equal :owner
     end
 
-    if ENV["PA_ORM"] == "mongo_mapper"
-      klass.associations[:notifications_as_owner].options[:class_name].must_equal "Notification"
-    else
-      klass.reflect_on_association(:notifications_as_owner).options[:class_name].must_equal "Notification"
-    end
+    klass.reflect_on_association(:notifications_as_owner).options[:class_name].must_equal "Notification"
   end
 
   it 'returns notifications from association' do
@@ -29,22 +21,6 @@ describe UserNotification::Activist do
           include UserNotification::Model
           self.table_name = 'users'
           acts_as_activist
-        end
-      when :mongoid
-        class ActivistUser
-          include Mongoid::Document
-          include UserNotification::Model
-          acts_as_activist
-
-          field :name, type: String
-        end
-      when :mongo_mapper
-        class ActivistUser
-          include MongoMapper::Document
-          include UserNotification::Model
-          acts_as_activist
-
-          key :name, String
         end
     end
     owner = ActivistUser.create(:name => "Peter Pan")
