@@ -36,15 +36,16 @@ module UserNotification
             # @return [Array<Notification>] Activities which self is the owner of.
             has_many :notifications_as_owner, :class_name => "::UserNotification::Notification", :as => :owner
 
-            has_many :notifyings, class_name: '::UserNotification::Notifying'
+            has_many :notifyings, class_name: '::UserNotification::Notifying', :foreign_key => 'recipient_id'
             # Association of notifications as their recipient.
             # @!method notifications_as_recipient
             # @return [Array<Notification>] Activities which self is the recipient of.
-            has_many :notifications_as_recipient, :through => :notifyings, :class_name => "::UserNotification::Notification" do
-              def unread
-                where('notifyings.read' => false)
+            has_many :notifications_as_recipient, :through => :notifyings,
+              :source => :notification,  :class_name => "::UserNotification::Notification"  do
+                def unread
+                  where('notifyings.read' => false)
+                end
               end
-            end
           end
         end
       end
