@@ -7,7 +7,7 @@ module UserNotification
         # Creates an association for notifications where self is the *notifiable*
         # object.
         def self.extended(base)
-          base.has_many :notifications, :class_name => "::UserNotification::Notification", :as => :notifiable
+          base.has_many :notifications, :as => :notifiable
         end
       end
     end

@@ -12,7 +12,7 @@ module UserNotification
         belongs_to :owner, :polymorphic => true
         # Define ownership to a resource targeted by this notification
         has_many :recipients, :through => :notifyings
-        has_many :notifyings, class_name: '::UserNotification::Notifying'
+        has_many :notifyings
         # Serialize parameters Hash
         serialize :parameters, Hash
 

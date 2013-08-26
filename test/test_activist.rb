@@ -16,9 +16,9 @@ describe UserNotification::Activist do
     end
 
     if ENV["PA_ORM"] == "mongo_mapper"
-      klass.associations[:notifications_as_owner].options[:class_name].must_equal "::UserNotification::Notification"
+      klass.associations[:notifications_as_owner].options[:class_name].must_equal "Notification"
     else
-      klass.reflect_on_association(:notifications_as_owner).options[:class_name].must_equal "::UserNotification::Notification"
+      klass.reflect_on_association(:notifications_as_owner).options[:class_name].must_equal "Notification"
     end
   end
 

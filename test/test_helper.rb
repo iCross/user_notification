@@ -44,6 +44,8 @@ when :active_record
     klass
   end
   class User < ActiveRecord::Base; end
+  class Notification < UserNotification::Notification; end
+  class Notifying < UserNotification::Notifying; end
 
   if ::ActiveRecord::VERSION::MAJOR < 4
     UserNotification::Notification.class_eval do
