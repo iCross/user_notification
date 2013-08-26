@@ -6,6 +6,8 @@ class CreateNotifyings < ActiveRecord::Migration
       t.belongs_to :recipient
       t.boolean :read, default: false
     end
+
+    add_index :notifyings, [:notification_id, :recipient_id]
   end
 
 end
