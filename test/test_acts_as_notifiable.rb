@@ -26,19 +26,13 @@ describe UserNotification::ActsAsNotifiable do
   end
 
   it 'can be acts_as_notifiable and be an activist at the same time' do
-    case UserNotification.config.orm
-      when :active_record
-        class ActivistAndNotifiableArticle < ActiveRecord::Base
-          self.table_name = 'articles'
-          include UserNotification::Model
-          acts_as_notifiable
-          acts_as_activist
+    class ActivistAndNotifiableArticle < ActiveRecord::Base
+      self.table_name = 'articles'
+      include UserNotification::Model
+      acts_as_notifiable
+      acts_as_activist
 
-          if ::ActiveRecord::VERSION::MAJOR < 4
-            attr_accessible :name, :published, :user
-          end
-          belongs_to :user
-        end
+      belongs_to :user
     end
 
     art = ActivistAndNotifiableArticle.new
@@ -138,11 +132,7 @@ describe UserNotification::ActsAsNotifiable do
     let(:options) { {} }
 
     it 'allows skipping the tracking on CRUD actions' do
-      case UserNotification.config.orm
-        when :active_record
-          art = article(:skip_defaults => true)
-      end
-
+      art = article(:skip_defaults => true)
       art.must_include UserNotification::Common
       art.wont_include UserNotification::Creation
       art.wont_include UserNotification::Update
@@ -170,22 +160,14 @@ describe UserNotification::ActsAsNotifiable do
     end
 
     it 'accepts :except option' do
-      case UserNotification.config.orm
-        when :active_record
-          art = article(:except => [:create])
-      end
-
+      art = article(:except => [:create])
       art.wont_include UserNotification::Creation
       art.must_include UserNotification::Update
       art.must_include UserNotification::Destruction
     end
 
     it 'accepts :only option' do
-      case UserNotification.config.orm
-        when :active_record
-          art = article({:only => [:create, :update]})
-      end
-
+      art = article({:only => [:create, :update]})
       art.must_include UserNotification::Creation
       art.wont_include UserNotification::Destruction
       art.must_include UserNotification::Update

@@ -45,14 +45,6 @@ module UserNotification
     @@config ||= UserNotification::Config.instance
   end
 
-  # Method used to choose which ORM to load
-  # when UserNotification::Notification class is being autoloaded
-  def self.inherit_orm(model="Notification")
-    orm = UserNotification.config.orm
-    require "user_notification/orm/#{orm.to_s}"
-    "UserNotification::ORM::#{orm.to_s.classify}::#{model}".constantize
-  end
-
   # Module to be included in ActiveRecord models. Adds required functionality.
   module Model
     extend ActiveSupport::Concern

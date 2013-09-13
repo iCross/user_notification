@@ -1,6 +1,0 @@
-test:
-  sessions:
-    default:
-      hosts:
-        - 127.0.0.1:27017
-      database: user_notification_test
