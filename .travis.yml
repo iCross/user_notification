@@ -2,22 +2,4 @@ language: ruby
 rvm:
   - 1.9.3
   - 2.0.0
-matrix:
-  include:
-    - rvm: 2.0.0
-      gemfile: gemfiles/Gemfile.rails-3.X
-      env: NOCOV=true PA_ORM=active_record
-    - rvm: 1.9.3
-      gemfile: gemfiles/Gemfile.rails-3.X
-      env: NOCOV=true PA_ORM=active_record
-    - rvm: 1.9.3
-      gemfile: gemfiles/Gemfile.rails-4.0
-      env: NOCOV=true PA_ORM=active_record
-    - rvm: 2.0.0
-      gemfile: gemfiles/Gemfile.rails-4.0
-      env: NOCOV=true PA_ORM=active_record
-email:
-  recipients:
-    - yesmeck@gmail.com
-  on_success: change
-  on_failure: always
+
