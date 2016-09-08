@@ -31,7 +31,7 @@ module UserNotification
         # Association of notifications as their recipient.
         # @!method notifications_as_recipient
         # @return [Array<Notification>] Activities which self is the recipient of.
-        has_many :notifications_as_recipient, :through => :notifyings, :class_name => "Notification"  do
+        has_many :notifications_as_recipient, :through => :notifyings, :source => :notification, :class_name => "Notification"  do
           def unread
             where('notifyings.read' => false)
           end
